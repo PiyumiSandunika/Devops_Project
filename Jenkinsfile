@@ -21,7 +21,8 @@ pipeline {
             steps {
                 echo 'Building backend Docker image...'
                 sh '''
-                    docker build -t ${BACKEND_IMAGE} ${GITHUB_REPO}#main:workshop-backend
+                    # Build from local backend folder
+                    docker build -t ${BACKEND_IMAGE} ./backend_new
                     docker tag ${BACKEND_IMAGE} ${DOCKER_HUB_USERNAME}/${BACKEND_IMAGE}:latest
                 '''
             }
@@ -31,7 +32,8 @@ pipeline {
             steps {
                 echo 'Building frontend Docker image...'
                 sh '''
-                    docker build -t ${FRONTEND_IMAGE} ${GITHUB_REPO}#main:frontend
+                    # Build from local frontend folder
+                    docker build -t ${FRONTEND_IMAGE} ./frontend
                     docker tag ${FRONTEND_IMAGE} ${DOCKER_HUB_USERNAME}/${FRONTEND_IMAGE}:latest
                 '''
             }
@@ -40,13 +42,15 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 echo 'Logging in to Docker Hub...'
-                sh 'echo ${DOCKER_HUB_CREDENTIALS_PSW} | docker login -u ${DOCKER_HUB_CREDENTIALS_USR} --password-stdin'
+                sh '''
+                    echo ${DOCKER_HUB_CREDENTIALS_PSW} | docker login -u ${DOCKER_HUB_CREDENTIALS_USR} --password-stdin
+                '''
             }
         }
 
         stage('Push Images to Docker Hub') {
             steps {
-                echo 'Pushing Docker images to Docker Hub...'
+                echo 'Pushing Docker images...'
                 sh '''
                     docker push ${DOCKER_HUB_USERNAME}/${BACKEND_IMAGE}:latest
                     docker push ${DOCKER_HUB_USERNAME}/${FRONTEND_IMAGE}:latest
@@ -57,10 +61,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Successfully built and pushed all images to Docker Hub!'
+            echo '✅ Successfully built and pushed backend & frontend images!'
         }
         failure {
-            echo '❌ Build failed. Check Jenkins logs for details.'
+            echo '❌ Build failed. Check Jenkins logs!'
         }
     }
 }
