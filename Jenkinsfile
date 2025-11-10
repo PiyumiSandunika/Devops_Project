@@ -2,65 +2,65 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDS = 'dockerhub-creds'
-        DOCKERHUB_USER  = 'piyumi00'
-        BACKEND_IMAGE   = "${DOCKERHUB_USER}/devops_project_backend:latest"
-        FRONTEND_IMAGE  = "${DOCKERHUB_USER}/devops_project_frontend:latest"
+        DOCKER_HUB_CREDENTIALS = credentials('dockerhub-creds')
+        DOCKER_HUB_USERNAME = 'piyumi00'
+        BACKEND_IMAGE = 'devops_project_backend'
+        FRONTEND_IMAGE = 'devops_project_frontend'
+        GITHUB_REPO = 'https://github.com/PiyumiSandunika/Devops_Project.git'
     }
 
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
-                checkout scm
+                echo 'Cloning repository...'
+                git branch: 'main', url: "${GITHUB_REPO}"
             }
         }
 
-        stage('Build Images') {
+        stage('Build Backend Image') {
             steps {
-                echo 'Building backend image...'
-                sh 'docker build -t devops_project-backend ./BUILDAURA_B'
-
-                echo 'Building frontend image...'
-                sh 'docker build -t devops_project-frontend ./BUILDAURA_F'
+                echo 'Building backend Docker image...'
+                sh '''
+                    docker build -t ${BACKEND_IMAGE} ${GITHUB_REPO}#main:workshop-backend
+                    docker tag ${BACKEND_IMAGE} ${DOCKER_HUB_USERNAME}/${BACKEND_IMAGE}:latest
+                '''
             }
         }
 
-        stage('Tag Images') {
+        stage('Build Frontend Image') {
             steps {
-                sh "docker tag devops_project-backend ${BACKEND_IMAGE}"
-                sh "docker tag devops_project-frontend ${FRONTEND_IMAGE}"
+                echo 'Building frontend Docker image...'
+                sh '''
+                    docker build -t ${FRONTEND_IMAGE} ${GITHUB_REPO}#main:frontend
+                    docker tag ${FRONTEND_IMAGE} ${DOCKER_HUB_USERNAME}/${FRONTEND_IMAGE}:latest
+                '''
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                echo 'Logging in to Docker Hub...'
+                sh 'echo ${DOCKER_HUB_CREDENTIALS_PSW} | docker login -u ${DOCKER_HUB_CREDENTIALS_USR} --password-stdin'
             }
         }
 
         stage('Push Images to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDS}", usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
-                    sh 'echo $DH_PASS | docker login -u $DH_USER --password-stdin'
-                    sh "docker push ${BACKEND_IMAGE}"
-                    sh "docker push ${FRONTEND_IMAGE}"
-                    sh 'docker logout'
-                }
+                echo 'Pushing Docker images to Docker Hub...'
+                sh '''
+                    docker push ${DOCKER_HUB_USERNAME}/${BACKEND_IMAGE}:latest
+                    docker push ${DOCKER_HUB_USERNAME}/${FRONTEND_IMAGE}:latest
+                '''
             }
         }
-
-        stage('Deploy Containers') {
-    steps {
-        echo 'Removing old containers if they exist...'
-        sh 'docker rm -f mongo  true'
-        sh 'docker rm -f backend  true'
-        sh 'docker rm -f frontend || true'
-
-        echo 'Deploying using Docker Compose...'
-        sh 'docker-compose up -d --build'
-    }
-}
-
     }
 
     post {
-        always {
-            echo 'Cleaning up unused Docker images...'
-            sh 'docker image prune -f'
+        success {
+            echo '✅ Successfully built and pushed all images to Docker Hub!'
+        }
+        failure {
+            echo '❌ Build failed. Check Jenkins logs for details.'
         }
     }
 }
