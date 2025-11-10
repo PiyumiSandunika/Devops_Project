@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import PropertyDetails from './PropertyDetails';
 import './Places.css';
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/properties`; // Backend API
-const API_BASE_URL = import.meta.env.VITE_API_URL; // Base URL for constructing image paths
+// const API_URL = `${import.meta.env.VITE_API_URL}/api/properties`; // Backend API
+// const API_BASE_URL = import.meta.env.VITE_API_URL; // Base URL for constructing image paths
+// Temporary fix - use localhost directly
+const API_BASE_URL = 'http://localhost:3000';
+const API_URL = `${API_BASE_URL}/api/properties`;
 
 const Places = ( ) => {
   const [selectedProperty, setSelectedProperty] = useState(null);
