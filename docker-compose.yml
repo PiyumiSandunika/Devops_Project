@@ -19,6 +19,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ./backend_new/uploads:/app/uploads
     networks:
       - housezone_net
 
@@ -32,6 +34,7 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+      - ./backend_new/db/properties.sql:/docker-entrypoint-initdb.d/properties.sql
     networks:
       - housezone_net
     healthcheck:
