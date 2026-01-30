@@ -1,17 +1,20 @@
 services:
   frontend:
-    build: ./frontend
+    image: piyumi00/devops_project_frontend:latest
+    container_name: housezone-frontend
     ports:
       - "5173:5173"
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=http://localhost:3000
+      # Use your Public AWS IP so the browser can reach the API
+      - VITE_API_URL=http://98.93.212.39:3000
     networks:
       - housezone_net
 
   backend:
-    build: ./backend_new
+    image: piyumi00/devops_project_backend:latest
+    container_name: housezone-backend
     ports:
       - "3000:3000"
     env_file:
@@ -26,12 +29,14 @@ services:
 
   db:
     image: mysql:8
+    container_name: housezone-db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root123
       MYSQL_DATABASE: new_find_house
-    ports:
-      - "3306:3306"
+    # Keep DB port closed to the public for security
+    expose:
+      - "3306"
     volumes:
       - db_data:/var/lib/mysql
       - ./backend_new/db/properties.sql:/docker-entrypoint-initdb.d/properties.sql
