@@ -8,9 +8,8 @@ pipeline {
         FRONTEND_IMAGE = 'devops_project_frontend'
         GITHUB_REPO = 'https://github.com/PiyumiSandunika/Devops_Project.git'
         
-        // The ID of the SSH Private Key credential you added in Jenkins for EC2 access
-        SSH_CREDENTIAL_ID = 'ec2-ssh-key'
         EC2_PUBLIC_IP = '98.93.212.39'
+        JENKINS_SSH_KEY = '/var/lib/jenkins/.ssh/id_ed25519'
     }
 
     stages {
@@ -53,18 +52,15 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 echo 'Connecting to EC2 and updating containers...'
-                // This requires the 'SSH Agent' plugin installed in Jenkins
-                sshagent(["${SSH_CREDENTIAL_ID}"]) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_PUBLIC_IP} << 'EOF'
-                            cd ~/Devops_Project
-                            git pull origin main
-                            docker-compose pull
-                            docker-compose up -d
-                            docker system prune -f
-                        EOF
-                    """
-                }
+                sh """
+                    ssh -i ${JENKINS_SSH_KEY} -o StrictHostKeyChecking=no ubuntu@${EC2_PUBLIC_IP} '
+                        cd ~/Devops_Project
+                        git pull origin main
+                        docker-compose pull
+                        docker-compose up -d
+                        docker system prune -f
+                    '
+                """
             }
         }
     }
@@ -74,7 +70,7 @@ pipeline {
             echo '✅ Deployment Successful! Your app is live at http://98.93.212.39:5173'
         }
         failure {
-            echo '❌ build or deployment failed. Check the Jenkins console output.'
+            echo '❌ Build or deployment failed. Check the Jenkins console output.'
         }
     }
 }
