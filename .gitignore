@@ -1,0 +1,41 @@
+cat <<EOF > .gitignore
+# ==========================
+# 1. FRONTEND RULES (Yours)
+# ==========================
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+frontend/.vscode/
+frontend/.idea/
+frontend/.DS_Store
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
+
+# ==========================
+# 2. BACKEND RULES (Python)
+# ==========================
+backend_new/__pycache__/
+backend_new/venv/
+backend_new/.env
+backend_new/*.pyc
+
+# ==========================
+# 3. TERRAFORM RULES (Critical)
+# ==========================
+terraform-ec2/.terraform/
+terraform-ec2/*.tfstate
+terraform-ec2/*.tfstate.*
+terraform-ec2/.terraform.lock.hcl
+terraform-ec2/*.tfvars
+terraform-ec2/crash.log
+
+# ==========================
+# 4. GLOBAL RULES
+# ==========================
+.DS_Store
+**/.env
+EOF
