@@ -67,7 +67,7 @@ export default function LoginPage() {
 
   // If not admin → do normal user login
   try {
-    const response = await fetch("http://localhost:3000/api/users/login", {
+    const response = await fetch("http://98.93.212.39:3000/api/users/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData)

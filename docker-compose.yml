@@ -3,12 +3,13 @@ services:
     image: piyumi00/devops_project_frontend:latest
     container_name: housezone-frontend
     ports:
-      - "5173:5173"
+      - "5173:5173"  # maps container port to EC2 port
     depends_on:
       - backend
     environment:
       # Use your Public AWS IP so the browser can reach the API
       - VITE_API_URL=http://98.93.212.39:3000
+      - VITE_HOST=0.0.0.0      # <-- Add this so Vite listens on all interfaces
     networks:
       - housezone_net
 
@@ -34,9 +35,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root123
       MYSQL_DATABASE: new_find_house
-    # Keep DB port closed to the public for security
     expose:
-      - "3306"
+      - "3306"  # internal use only, not public
     volumes:
       - db_data:/var/lib/mysql
       - ./backend_new/db/properties.sql:/docker-entrypoint-initdb.d/properties.sql
