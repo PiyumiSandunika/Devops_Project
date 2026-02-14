@@ -23,7 +23,7 @@ function Hero() {
   return (
     <div className="hero">
       <div className="hero-content">
-        <h1>Find a home that suits your lifestyle</h1>
+        <h1>Piyumi Sandunika</h1>
         <p>Browse trusted listings across Sri Lanka and discover the perfect house for your comfort, convenience.</p>
       </div>
 
