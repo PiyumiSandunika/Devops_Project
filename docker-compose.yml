@@ -24,7 +24,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./backend_new/uploads:/app/uploads
+      - ./backend_new/uploads:/app/uploads:rw 
     networks:
       - housezone_net
 
