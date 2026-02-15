@@ -7,7 +7,7 @@
 
 .contact-main {
   width: 98vw;
-  height: 100vh;       /* or your desired height */
+  height: 130vh;       /* or your desired height */
   background: url('/src/assets/C4.jpg') no-repeat center center;
   background-size: cover;
   position: relative;
